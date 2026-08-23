@@ -46,3 +46,18 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
+      
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
+            docker rm -f devops-app || true
+            docker run -d \
+              --name devops-app \
+              --restart unless-stopped \
+              -p 80:5000 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
