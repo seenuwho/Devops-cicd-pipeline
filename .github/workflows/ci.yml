@@ -32,3 +32,8 @@ jobs:
       - name: Run application
         run: |
           python app/app.py
+                - name: Build Docker image
+        run: docker build -t devops-app .
+
+      - name: Run Docker container
+        run: docker run devops-app
